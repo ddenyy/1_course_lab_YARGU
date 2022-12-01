@@ -1,0 +1,7 @@
+﻿  lab_6.cpp
+C:\Users\Школьник2003\dev\С++\homework_labs\lab_6\lab_6\Base_operation_matrix.h(29,33): warning C4244: *=: преобразование "_Ty" в "__int64", возможна потеря данных
+          with
+          [
+              _Ty=double
+          ]
+  lab_6.vcxproj -> C:\Users\Школьник2003\dev\С++\homework_labs\lab_6\x64\Debug\lab_6.exe
