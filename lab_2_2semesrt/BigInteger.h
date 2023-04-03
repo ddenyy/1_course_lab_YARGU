@@ -41,4 +41,7 @@ public:
 
 	BigInteger operator+(const BigInteger& other) const;
 	BigInteger operator - (const BigInteger &other) const;
+	BigInteger operator/(const BigInteger& other) const;
+	BigInteger& operator-=(const BigInteger& other);
+	BigInteger operator%(const BigInteger& bigInt) const;
 };

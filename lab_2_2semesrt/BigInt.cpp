@@ -264,7 +264,8 @@ BigInt BigInt::operator-(const BigInt &bigInt) const {
 			a[i] += (i < len1) ? (value[len1 - 1 - i] - '0') : 0; // формируем разряды
 			b[i] += (i < len2) ? (value2[len2 - 1 - i] - '0') : 0; // из строк аргументов
 
-			b[i + 1] = -isNegRes; // в зависимости от знака занимаем или не занимаем
+			b[i + 1] = -isNegRes; // в зависимости от знака зани
+			маем или не занимаем
 			a[i + 1] = isNegRes- 1; // 10 у следующего разряда
 
 			res[length - 1 - i] += 10 + sign * (b[i] - a[i]);

@@ -6,11 +6,14 @@
 int main()
 {
     
-    BigInteger number_first("111");
-    BigInteger number_second("222");
+    BigInteger number_first("100");
+    BigInteger number_second("-123123");
 
-    BigInteger Ans = number_second - number_first;
+    BigInteger Ans = number_second % number_first;
+    string str_ans = Ans.getValue();
+    Ans.getIsNegative() ? str_ans = "-" + str_ans : str_ans;
+    cout << str_ans << '\n';
 
-    cout << Ans.getValue();
-
+    return 0;
 }
+
