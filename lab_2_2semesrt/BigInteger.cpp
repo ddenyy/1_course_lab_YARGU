@@ -56,7 +56,6 @@ BigInteger::BigInteger(const string &value)
 	this->value = value.substr(this->isNegative);
 
 	this->clearLeadingZeros();
-	this->checkDigits();
 }
 
 // конструктор копирования
@@ -65,8 +64,6 @@ BigInteger::BigInteger(const BigInteger &other)
 	this->value = other.getValue();
 	this->isNegative = other.getIsNegative();
 }
-
-
 
 // ф-ция удаления ведущих нулей
 void BigInteger::clearLeadingZeros()
@@ -80,20 +77,6 @@ void BigInteger::clearLeadingZeros()
 	// очистили ведущие нули
 	this->value = this->value.substr(position);
 }
-
-// проверка на то что значение содержит только цифры
-void BigInteger::checkDigits()
-{
-	for (size_t i = 0; i < this->value.size(); i++)
-	{
-		if (this->value[i] > '9' || this->value[i] < '0')
-		{
-			//// выкидываем исключение если число состоит не из символов соотв цифрам
-			//throw string("value of container include INCORRECT characters: ") + this->value;
-		}
-	}
-}
-
 
 string BigInteger::getValue() const
 {
@@ -153,15 +136,39 @@ const bool BigInteger::operator != (const BigInteger &other) const
 
 const bool BigInteger::operator < (const BigInteger &other) const
 {
-	std::string value2 = other.getValue(); // получаем значение второго числа
-	size_t len1 = value.length(); // запоминаем длину первого числа
-	size_t len2 = value2.length(); // запоминаем длину второго числа
+	string value2 = other.getValue(); // значение второго числа
+	size_t len1 = value.length(); // длину первого числа
+	size_t len2 = value2.length(); // длину второго числа
 
 	// если знаки одинаковые, то проверяем значения
 	if (isNegative == other.getIsNegative()) {
-		// если длины не равны
 		if (len1 != len2)
-			return (len1 < len2) ^ isNegative; // меньше число с меньшей длинной для положительных и с большей длиной для отрицательных
+		{
+			if (this->getIsNegative())
+			{
+				// число отрицательное, больше то, которое по длинне меньше
+				if (len1 < len2)
+				{
+					return false;
+				}
+				else {
+					return true;
+				}
+			}
+			else {
+				if (len1 < len2)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+				
+			}
+
+			//return (len1 < len2) ^ isNegative; // меньше число с меньшей длинной для положительных и с большей длиной для отрицательных
+		}
 
 		size_t i = 0;
 
@@ -170,7 +177,22 @@ const bool BigInteger::operator < (const BigInteger &other) const
 			i++;
 
 		// если разряд найден, то меньше число с меньшей цифрой для положительных и с большей цифрой для отрицательных, иначе числа равны
-		return (i < len1) && ((value[i] < value2[i]) ^ isNegative);
+		if (i < len1)
+		{
+			if (this->getIsNegative())
+			{
+				return value[i] > value2[i];
+			}
+			else
+			{
+				return value[i] < value2[i];
+			}
+		}
+		else
+		{
+			return false;
+		}/*
+		return (i < len1) && ((value[i] < value2[i]) ^ isNegative);*/
 	}
 
 	return isNegative; // знаки разные, если число отрицательное, то оно меньше, если положительное, то больше
@@ -189,26 +211,23 @@ const bool BigInteger::operator >= (const BigInteger &other) const {
 	return *this > other || *this == other;
 }
 
-BigInteger &BigInteger::operator = (const BigInteger &bigInt) {
-	this->value = bigInt.getValue();
-	this->isNegative = bigInt.getIsNegative();
-
+BigInteger &BigInteger::operator = (const BigInteger & other) {
+	this->value = other.getValue();
+	this->isNegative = other.getIsNegative();
 	return *this;
 }
 
 
 // унарный минус, если было отрицательным, возвращаем положительное, иначе отрицательное
 BigInteger BigInteger::operator - () const && {
-	string copy = this->isNegative ? this->value : std::string("-") + this->value;
+	string copy = this->isNegative ? this->value : string("-") + this->value;
 	BigInteger Current(copy);
-
 	return Current;
 }
 
 // унарный плюс (просто копируем значение числа)
 BigInteger BigInteger::operator + () const&& {
 	BigInteger Current = *this;
-
 	return Current;
 }
 
@@ -216,7 +235,6 @@ BigInteger BigInteger::operator + () const&& {
 BigInteger BigInteger::operator++(int) {
 	BigInteger res = *this;
 	*this = *this + BigInteger(1);
-
 	return res;
 }
 
@@ -234,7 +252,6 @@ BigInteger& BigInteger::operator--() {
 BigInteger BigInteger::operator--(int) {
 	BigInteger res = *this;
 	*this = *this - BigInteger(1);
-
 	return res;
 }
 
@@ -242,14 +259,15 @@ BigInteger BigInteger::operator--(int) {
 
 
 BigInteger BigInteger::operator+(const BigInteger& other) const {
-	bool isAddOp = !(other.getIsNegative() ^ this->getIsNegative()); // если знаки одинаковые, то выполняем сложение
+	//bool isAddOp = !(other.getIsNegative() ^ this->getIsNegative()); // если знаки одинаковые, то выполняем сложение
+	bool isAddOp = other.getIsNegative() == this->getIsNegative(); // если знаки одинаковые, то выполняем сложение
 
 	if (isAddOp) {
-		string num2 = other.getValue(); // запоминаем значение второго числа
+		string num2 = other.getValue(); // значение второго числа
 
-		size_t len1 = this->value.size(); // запоминаем длину первого числа
-		size_t len2 = num2.size(); // запоминаем длину второго числа
-		size_t length = 1 + max(len1, len2);  // длина суммы равна максимуму из двух длин + 1 из-за возможного переноса разряда
+		size_t len1 = this->value.size(); // длину первого числа
+		size_t len2 = num2.size(); // длину второго числа
+		size_t length = 1 + max(len1, len2);  // длина суммы + 1 из-за возможного переноса разряда
 
 		string res = "0";// строковый массив для выполнения операции сложения
 		res.resize(length + 1);
@@ -336,8 +354,8 @@ BigInteger& BigInteger::operator-=(const BigInteger& other) {
 
 // бинарный слеш (деление двух чисел)
 BigInteger BigInteger::operator/(const BigInteger& other) const {
-	std::string value1 = value;
-	std::string value2 = other.getValue(); // запоминаем значение второго числа
+	string value1 = value;
+	string value2 = other.getValue(); // запоминаем значение второго числа
 
 	if (value2[0] == '0')
 		throw string("Division by zero!"); // нельзя делить на ноль, этому ещё в школе учат
@@ -372,48 +390,49 @@ BigInteger BigInteger::operator/(const BigInteger& other) const {
 	size_t index = 0; // стартуем с нулевого индекса
 
 	string div; // строка результата деления
-	string v; // строка подчисла (которое делится на делитель в столбик)
+	string tmp_num; // строка подчисла (которое делится на делитель в столбик)
 
 	// формируем начальное число для деления
-	while (BigInteger(v) < tmp && index < length)
-		v += value1[index++];
+	while (BigInteger(tmp_num) < tmp && index < length)
+		tmp_num += value1[index++];
 
 	do {
 		int count = 0; // результат деления подчисла на делитель
 
 		// если можем разделить, то делим
-		if (BigInteger(v) >= tmp) {
+		if (BigInteger(tmp_num) >= tmp) {
 			if (divider_length > 8) { // если не входит в long, то делим с помощью вычитания
-				BigInteger mod = v;
+				BigInteger mod = tmp_num;
 
 				while (mod >= tmp) {
 					mod -= tmp;
 					count++;
 				}
 
-				v = mod.getValue();
+				tmp_num = mod.getValue();
 			}
 			else {
-				long mod = stol(v);
+				long mod = stol(tmp_num);
 				count = mod / divider_v;
-				v = std::to_string(mod % divider_v);
+				tmp_num = to_string(mod % divider_v);
 			}
 		}
 
-		div += count + '0'; // если не делили, то добавили ноль к результату, иначе добавили результат дедения
+		div += count + '0'; // если не делили, то добавили ноль к результату, иначе добавили результат деления
 
 		if (index <= length)
-			v += value1[index++]; // формируем новое значение для подчисла
+			tmp_num += value1[index++]; // формируем новое значение для подчисла
 	} while (index <= length);
 
-	return BigInteger(isNegRes && div != "0" ? std::string("-") + div : div); // возвращаем результат учитывая знак и возможное равенство нулю
+	return BigInteger(isNegRes && div != "0" ? string("-") + div : div); // возвращаем результат учитывая знак и возможное равенство нулю
 }
 
 
 
-// бинарный процент (операция взятия остатка от деления) (полностью аналогична делению)
-BigInteger BigInteger::operator%(const BigInteger& bigInt) const {
-	std::string value2 = bigInt.getValue();
+// бинарный процент (операция взятия остатка от деления)
+BigInteger BigInteger::operator%(const BigInteger& other) const {
+	string value2 = other.getValue();
+	string value = this->getValue();
 
 	if (value2[0] == '0')
 		throw string("Division by zero!");
@@ -434,28 +453,28 @@ BigInteger BigInteger::operator%(const BigInteger& bigInt) const {
 	size_t length = value.length();
 	size_t index = 0;
 	BigInteger mod2 = value;
-	string v;
+	string tmp_num;
 
-	while (BigInteger(v) < tmp && index < length)
-		v += value[index++];
+	while (BigInteger(tmp_num) < tmp && index < length)
+		tmp_num += value[index++];
 
 	do {
-		if (BigInteger(v) >= tmp) {
+		if (BigInteger(tmp_num) >= tmp) {
 			if (divider_v)
-				v = to_string(stol(v) % divider_v);
+				tmp_num = to_string(stol(tmp_num) % divider_v);
 			else {
-				BigInteger mod = v;
+				BigInteger mod = tmp_num;
 
 				while (mod >= tmp)
 					mod -= tmp;
 
-				v = mod.getValue();
+				tmp_num = mod.getValue();
 			}
 		}
 
 		if (index <= length) {
-			mod2 = v;
-			v += value[index++];
+			mod2 = tmp_num;
+			tmp_num += value[index++];
 		}
 	} while (index <= length);
 
@@ -469,17 +488,17 @@ BigInteger BigInteger::operator%(const BigInteger& bigInt) const {
 
 
  
-BigInteger BigInteger::operator * (const BigInteger& bigInt) const
+BigInteger BigInteger::operator * (const BigInteger& other) const
 {
-	if (value == "0" || bigInt.getValue() == "0")
+	if (value == "0" || other.getValue() == "0")
 		return 0; // если один из множителей равен нулю, то результат равен нулю
 
-	string value2 = bigInt.getValue(); // запоминаем значение второго числа
+	string value2 = other.getValue(); // запоминаем значение второго числа
 
 	size_t len1 = value.length(); // запоминаем длину первого числа
 	size_t len2 = value2.length(); // запоминаем длину второго числа
 	size_t length = len1 + len2 + 1; // резульат влезет в сумму длин + 1 из-за возможного переноса
-	bool isNegRes = this->getIsNegative() ^ bigInt.getIsNegative(); // флаг отрицательности результата - отрицательный, если числа разных знаков
+	bool isNegRes = this->getIsNegative() ^ other.getIsNegative(); // флаг отрицательности результата - отрицательный, если числа разных знаков
 
 	vector<int> a(length), b(length); // массивы аргументов и результата
 
@@ -512,18 +531,18 @@ BigInteger BigInteger::operator * (const BigInteger& bigInt) const
 }
 
 // вывод числа в выходной поток
-ostream& operator<<(std::ostream& stream, const BigInteger& bigInt) {
-	if (bigInt.getIsNegative())
+ostream& operator<<(ostream& stream, const BigInteger& other) {
+	if (other.getIsNegative())
 		stream << "-";
 
-	return stream << bigInt.getValue();
+	return stream << other.getValue();
 }
 
 // ввод числа из входного потока
-istream& operator>>(istream& stream, BigInteger& bigInt) {
+istream& operator>>(istream& stream, BigInteger& other) {
 	string value;
 	stream >> value;
-	bigInt = BigInteger(value);
+	other = BigInteger(value);
 
 	return stream;
 }

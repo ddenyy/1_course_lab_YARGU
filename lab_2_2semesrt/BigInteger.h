@@ -9,7 +9,6 @@ private:
 	string value;
 	bool isNegative;
 	void clearLeadingZeros();
-	void checkDigits();
 
 public:
 	BigInteger();
@@ -49,7 +48,7 @@ public:
 	BigInteger operator - (const BigInteger &other) const;
 	BigInteger operator / (const BigInteger& other) const;
 	BigInteger& operator -= (const BigInteger& other);
-	BigInteger operator % (const BigInteger& bigInt) const;
+	BigInteger operator % (const BigInteger& other) const;
 	BigInteger operator * (const BigInteger& bigInt) const;
 	friend ostream& operator<<(std::ostream& stream, const BigInteger& bigInt);
 	friend istream& operator>>(std::istream& stream, BigInteger& bigInt);
