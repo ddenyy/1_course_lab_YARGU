@@ -1,3 +1,8 @@
 lab_2_16var_25_09_22/lab_2_16var_25_09_22/x64/*
 int64/*
 lab_1_OsipovDenis_PMI13BO_2semestr.sln
+*/x64
+*.sln
+*.vcxproj
+*.filters
+*.user
