@@ -1,8 +1,6 @@
 #pragma once
 #include "Header.h"
 
-
-
 class Point {
 public:
 	double x;
@@ -45,4 +43,15 @@ public:
 		res.y = y * k;
 		return res;
 	}
+
+	int operator * (Point k)
+	{
+		return this->x * k.x + this->y * k.y;
+	}
 };
+
+
+double dist(Point a)
+{
+	return sqrt(a.x * a.x + a.y * a.y);
+}

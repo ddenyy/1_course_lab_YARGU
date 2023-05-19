@@ -6,9 +6,8 @@
 int main()
 {
 	setlocale(LC_ALL, "Russian");
-	Line K(5, 5, 5);
-	Line L(5, 5, 5);
-	
+	Line K(1, 1, 0);
+	Point test(5, 5);
 
 	Point A(1, 1);
 	Point B(1, 4);
@@ -17,23 +16,12 @@ int main()
 
 	Polygon poly(4, A, B, C, D);
 
-	Point A2(1, 1);
-	Point B2(1, 6);
-	Point C2(6, 6);
-	Point D2(6, 1);
 
-	Polygon poly2(4, A2, B2, C2, D2);
+	poly.scale(test, 2);
 
 	vector<Point> arr = poly.getVertex();
 
-	//for (int i = 0; i < arr.size(); i++)
-	//{
-	//	cout << arr[i].x << ' ' << arr[i].y << '\n';
-	//}
-
-	cout << poly.isCongruentTo(poly2) << "\n";
-
-	
+	for (auto i : arr) cout << i.x << ' ' << i.y << '\n';
 	
 }
 

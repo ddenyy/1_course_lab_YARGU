@@ -42,6 +42,12 @@ public:
 		return A.x * B.x + A.y * B.y;
 	}
 
+	// векторное произведение
+	double cross(Point A, Point B)
+	{
+		return A.x * B.y - A.y * B.x;
+	}
+
 
 	// ф-ция подсчета площади многоугольника
 	double area()
@@ -126,6 +132,42 @@ public:
 				return flag_convex;
 			}
 		}
+	}
+
+	// проверка на выпуклость через векторное произведение
+	bool isConvex_v2()
+	{
+		/*
+		Можно пройтись по сторонам многоугольника и проверять векторным произведением,
+		что мы поворачиваем всегда в одну сторону
+		*/
+
+		double cross_prev = NULL;
+
+		Point a = this->vertexs[0];
+		Point b = this->vertexs[1];
+
+		for (int i = 2; i < this->vertexs.size(); i++)
+		{
+			Point c = this->vertexs[i];
+
+			if (cross_prev == NULL)
+			{
+				cross_prev = cross(b - a, c - a);
+			}
+
+			if (cross(b - a, c - a) * cross_prev > 0)
+			{
+				continue;
+			}
+			else
+			{
+				return false;
+			}
+			a = b;
+			b = c;
+		}
+		return true;
 	}
 
 	vector<Point> getVertex()
@@ -366,6 +408,95 @@ public:
 
 		return result;
 	}
+
+
+
+	// поворот любой фигуры относительно центра на угол
+	void rotate(Point center, double angle)
+	{
+		double dx = center.x;
+		double dy = center.y;
+
+		for (int i = 0; i < this->vertexs.size(); i++)
+		{
+			int x = this->vertexs[i].x;
+			int y = this->vertexs[i].y;
+			this->vertexs[i].x = ((x - dx) * cos(angle)) - ((y - dy) * sin(angle)) + dx;
+			this->vertexs[i].y = ((x - dx) * sin(angle)) + ((y - dy) * cos(angle)) + dy;
+		}
+	}
+
+	// симметрия относительно точки
+	void reflex(Point center)
+	{
+		for (int i = 0; i < this->vertexs.size(); i++)
+		{
+			Point cur = this->vertexs[i];
+			Point direction_center = center - cur;
+			double dist_cur_and_center = dist(direction_center);
+
+			direction_center.x = direction_center.x / dist_cur_and_center;
+			direction_center.y = direction_center.y / dist_cur_and_center;
+
+			this->vertexs[i] = center + (direction_center * dist_cur_and_center);
+
+		}
+	}
+
+
+	// симметрия относительно прямой
+	void reflex(Line axis)
+	{
+		pair<Point, Point> new_view_axis = axis.transform_equation_line();
+		Point a = new_view_axis.first;
+		Point b = new_view_axis.second;	
+
+		for (int i = 0; i < this->vertexs.size(); i++)
+		{
+			double x = vertexs[i].x;
+			double y = vertexs[i].y;
+
+			// проверка что точка которую будет отображать лежить на данной прямой
+			if (abs(axis.A * x + axis.B * y + axis.C) < EPS)
+			{
+				continue;
+			}
+			else
+			{
+				/*
+				Семантика формулы такова - вычислить расстояния от точки до прямой,
+				и это расстояния отложить, но в противоположную сторону
+				*/
+
+				Point ps = this->vertexs[i];
+
+				Point n;
+				n.x = a.y - b.y;
+				n.y = b.x - a.x;
+
+				double len = sqrt(n.x * n.x + n.y * n.y);
+				n.x /= len;
+				n.y /= len;
+
+				double dot2 = 2 * (n.x * ps.x + n.y * ps.y);
+
+				this->vertexs[i].x = ps.x - dot2 * n.x;
+				this->vertexs[i].y = ps.y - dot2 * n.y;
+			}
+		}
+	}
+
+
+	void scale(Point center, double coef)
+	{
+		for (int i = 0; i < vertexs.size(); i++)
+		{
+			vertexs[i].x = center.x + (vertexs[i].x - center.x) * coef;
+			vertexs[i].y = center.y + (vertexs[i].y - center.y) * coef;
+		}
+	}
+
+
 
 private:
 	int count_vertex = 0;
