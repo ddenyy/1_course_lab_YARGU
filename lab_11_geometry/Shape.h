@@ -16,22 +16,22 @@ public:
 	bool operator == (Shape& another);
 
 	//// равна ли эта фигура в геометрическом смысле
-	//virtual bool isCongruentTo(const Shape& another);
+	 bool isCongruentTo(const Shape& another);
 
 	//// подобна ли эта фигура в геометрическом смысле
-	//virtual bool isSimilarTo(const Shape& another);
+	 bool isSimilarTo(const Shape& another);
 
 	//// содержит ли фигура точку
-	//virtual bool containsPoint(Point point);
+	 bool containsPoint(Point point);
 
 
-	//virtual void rotate(Point center, double angle);
+	 void rotate(Point center, double angle);
 
 	//// симметрия относительно линии
-	//virtual void reflex(Line axis);
+	 void reflex(Line axis);
 
 	//// симметрия относительно точки
-	//virtual void reflex(Point center);
+	 void reflex(Point center);
 
-	//virtual void scale(Point center, double coef);
+	 void scale(Point center, double coef);
 };

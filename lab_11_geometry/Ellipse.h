@@ -3,14 +3,13 @@
 #include "Point.h"
 #include "Line.h"
 #include "Polygon.h"
+#include "Shape.h"
 
-class Ellipse
+class Ellipse: public Shape
 {
 public:
 
 	Ellipse(Point focus_first, Point focus_second, double distantion) {
-
-		// будем считать, что эллипс в канононической системе
 		
 		this->focus_first = focus_first;
 		this->focus_second = focus_second;
@@ -20,7 +19,7 @@ public:
 		//чтобы сумма ее расстояний до фокусов равнялась большой оси эллипса 2a
 		this->a = distantion / 2;
 
-		this->c = abs(focus_first.x);
+		this->c = sqrt(dist(focus_first - focus_second));
 
 		this->eccentricity = this->c / this->a;
 
@@ -51,12 +50,12 @@ public:
 		return this->center;
 	}
 
-	double perimetr()
+	double perimetr() 
 	{
 		return 2 * PI * sqrt((a * a + b * b) / 2);
 	}
 
-	double area()
+	double area() 
 	{
 		return PI * a * b;
 	}
@@ -87,6 +86,15 @@ public:
 		}
 	}
 
+	bool operator == (Ellipse& another)
+	{
+		if (this->isCongruentTo(another))
+		{
+			return true;
+		}
+		return false;
+	}
+
 	// подобие двух
 	bool isSimilarTo(Ellipse& another)
 	{
@@ -113,6 +121,11 @@ public:
 		y = focus_second.y;
 		focus_second.x = ((x - dx) * cos(angle)) - ((y - dy) * sin(angle)) + dx;
 		focus_second.y = ((x - dx) * sin(angle)) + ((y - dy) * cos(angle)) + dy;
+
+		this->center.x = (focus_first.x + focus_second.x) / 2;
+		this->center.y = (focus_first.y + focus_second.y) / 2;
+
+
 	}
 
 	// симметрия относительно точки
@@ -136,6 +149,9 @@ public:
 			direction_center.y = direction_center.y / dist_cur_and_center;
 
 			focus_second = center + (direction_center * dist_cur_and_center);
+
+			this->center.x = (focus_first.x + focus_second.x) / 2;
+			this->center.y = (focus_first.y + focus_second.y) / 2;
 	}
 
 	// симметрия относительно прямой
@@ -180,16 +196,21 @@ public:
 			n.x = a.y - b.y;
 			n.y = b.x - a.x;
 
-			double len = sqrt(n.x * n.x + n.y * n.y);
+			len = sqrt(n.x * n.x + n.y * n.y);
 			n.x /= len;
 			n.y /= len;
 
-			double dot2 = 2 * (n.x * ps.x + n.y * ps.y);
+			dot2 = 2 * (n.x * ps.x + n.y * ps.y);
 
 			focus_second.x = ps.x - dot2 * n.x;
 			focus_second.y = ps.y - dot2 * n.y;
+
+			this->center.x = (focus_first.x + focus_second.x) / 2;
+			this->center.y = (focus_first.y + focus_second.y) / 2;
 		}
 	}
+
+
 
 	void scale(Point center, double coef)
 	{
@@ -197,6 +218,9 @@ public:
 		focus_first.y = center.y + (focus_first.y - center.y) * coef;
 		focus_second.x = center.x + (focus_second.x - center.x) * coef;
 		focus_second.y = center.y + (focus_second.y - center.y) * coef;
+
+		this->center.x = (focus_first.x + focus_second.x) / 2;
+		this->center.y = (focus_first.y + focus_second.y) / 2;
 	}
 
 

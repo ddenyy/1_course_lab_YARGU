@@ -4,7 +4,7 @@
 #include "Line.h"
 #include "Shape.h"
 
-class Polygon : Shape
+class Polygon : public Shape
 {
 public:
 
@@ -50,7 +50,7 @@ public:
 
 
 	// ф-ция подсчета площади многоугольника
-	double area()
+	double area() 
 	{
 		double res = 0;
 		for (int i = 0; i < vertexs.size(); i++)
@@ -63,7 +63,7 @@ public:
 		return fabs(res) / 2;
 	}
 
-	double perimetr()
+	double perimetr() 
 	{
 		double sum = 0;
 		for (int i = 0; i < vertexs.size(); i++)
@@ -179,11 +179,6 @@ public:
 	int getCountVertex()
 	{
 		return count_vertex;
-	}
-
-	double dist(Point a)
-	{
-		return sqrt(a.x * a.x + a.y * a.y);
 	}
 
 	// ф-ция обхода фигуры. считает её углы и длинны сторон. записывает в массивы соотв

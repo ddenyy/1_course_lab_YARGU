@@ -51,7 +51,8 @@ public:
 };
 
 
-double dist(Point a)
+// inline в силу того, что эта ф-ция как бы глобальная для всех кто полуется расстоянием
+inline double dist(Point a)
 {
 	return sqrt(a.x * a.x + a.y * a.y);
 }
