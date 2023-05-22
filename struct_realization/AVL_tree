@@ -1,0 +1,269 @@
+#include <iostream>
+#include <algorithm>
+
+using namespace std;
+
+//Узел дерева AVL
+class AVLNode {
+public:
+	//значение которое хрнаится в этом узле
+	int key;
+	//левый и правый сыновья
+	AVLNode* left;
+	AVLNode* right;
+	//глубина
+	int depth;
+};
+
+//max int int
+int max(int a, int b) {
+	if (a > b) {
+		return a;
+	}
+	else {
+		return b;
+	}
+}
+
+//Функция нахождения глубины дерева
+int depth(AVLNode* elem) {
+	if (elem == NULL) {
+		return 0;
+	}
+	return elem->depth;
+}
+
+//создание нового узла
+AVLNode* newNode(int key) {
+	AVLNode* node = new AVLNode();
+	node->key = key;
+	node->left = NULL;
+	node->right == NULL;
+	node->depth = 1; //добавили как лист в дерево
+	return node;
+}
+
+//Порот вправо поддерева с корнем y ("игрэк")
+AVLNode* rightRotate(AVLNode* y) {
+	AVLNode* x = y->left;
+	AVLNode* T2 = x->right;
+
+	//Вращение
+	x->right = y;
+	y->left = T2;
+
+	y->depth = max(depth(y->left), depth(y->right)) + 1;
+	x->depth = max(depth(x->left), depth(x->right)) + 1;
+
+	return x;
+}
+
+//Поворот влево поддерева с корнем x ("икс")
+AVLNode* leftRotate(AVLNode* x) {
+	AVLNode* y = x->right;
+	AVLNode* T2 = y->left;
+
+	//Вращение
+	y->left = x;
+	x->right = T2;
+
+	x->depth = max(depth(x->left), depth(x->right)) + 1;
+	y->depth = max(depth(y->left), depth(y->right)) + 1;
+
+	return y;
+}
+
+//Ф-я для получения разницы между высотами левых и правых сыновей
+int getBalance(AVLNode* elem) {
+	if (elem == NULL) {
+		return 0;
+	}
+	else {
+		return depth(elem->left) - depth(elem->right);
+	}
+}
+
+//Ф-я добавления(вставки для узла)
+AVLNode* insert(AVLNode* node, int key) {
+	if (node == NULL) {
+		//если узла не существовало
+		return newNode(key);
+	}
+	if (key < node->key) {
+		//уход влево
+		node->left = insert(node->left, key);
+	}
+	else if (key > node->key) {
+		//уход вправо
+		node->right = insert(node->right, key);
+	}
+	else {
+		//здесь обрабатывается ситуация key == node->key
+		return node;
+	}
+
+	node->depth = 1 + max(depth(node->left), depth(node->right));
+
+	int balance = getBalance(node);
+
+	//поворот влево-влево
+	if (balance > 1 && key < node->left->key) {
+		return rightRotate(node);
+	}
+
+	//левое поддерево больше правого => поворот вправо-вправо
+	if (balance < -1 && key>node->right->key) {
+		return leftRotate(node);
+	}
+
+	//поворот влево-вправо
+	if (balance > 1 && key > node->left->key) {
+		node->left = leftRotate(node->left);
+		return rightRotate(node);
+	}
+
+	//поворот вправо-влево
+	if (balance < -1 && key < node->right->key) {
+		node->right = rightRotate(node->right);
+		return leftRotate(node);
+	}
+
+	return node;
+}
+
+//Ф-я показа дерева на экран
+void show(AVLNode* Elem, int level) {
+	if (Elem->left != NULL) {
+		show(Elem->left, level + 1);
+	}
+	for (int i = 0; i < level; ++i) {
+		cout << "    ";
+	}
+	cout << Elem->key << "\n";
+	if (Elem->right != NULL) {
+		show(Elem->right, level + 1);
+	}
+}
+
+//какое минимальное значание хранится в дереве
+AVLNode* minValueNode(AVLNode* node) {
+	AVLNode* current = node;
+	//найти крайний левый лист
+	while (current->left != NULL) {
+		current = current->left;
+	}
+	return current;
+}
+
+//Ф-я удаления узла из дерева
+AVLNode* deleteNode(AVLNode* root, int key) {
+	if (root == NULL) {
+		return root;
+	}
+	if (key < root->key) {
+		//узел находится слева
+		root->left = deleteNode(root->left, key);
+	}
+	else if (key > root->key) {
+		//узел находится справа
+		root->right = deleteNode(root->right, key);
+	}
+	else {
+		//key == root->key
+
+		//узел только с одним дочерним элементом или без дочернего элемента
+		if ((root->left == NULL) || (root->right == NULL)) {
+			AVLNode* temp = root->left !=NULL ? root->left : root->right;
+			if (temp == NULL) {
+				//Нет никого из них
+				temp = root;
+				root = NULL;
+			}
+			else {
+				//переделываем значение: указателю на рут передаём все значения от указателя на тэмп
+				*root = *temp;
+			}
+		}
+		else {
+			AVLNode* temp = minValueNode(root->right);
+			root->key = temp->key;
+			root->right = deleteNode(root->right, temp->key);
+		}
+	}
+
+	if (root == NULL) {
+		return root;
+	}
+
+	//обновление глубины
+	root->depth = max(depth(root->left), depth(root->right)) + 1;
+
+	int balance = getBalance(root);
+
+	//делаем поврот если дерево не сбалансировано
+
+	//влево-влево
+	if (balance > 1 && getBalance(root->left) >= 0) {
+		return rightRotate(root);
+	}
+	//влево-вправо
+	if (balance > 1 && getBalance(root->left) < 0) {
+		root->left = leftRotate(root->left);
+		return rightRotate(root);
+	}
+	//вправо-вправо
+	if (balance < -1 && getBalance(root->right) <= 0) {
+		return leftRotate(root);
+	}
+	//вправо-влево
+	if (balance < -1 && getBalance(root->right) > 0) {
+		root->right = rightRotate(root->right);
+		return leftRotate(root);
+	}
+	//не нужно блыо делать поворотов
+	return root;
+}
+
+
+//ШАБЛОННЫЕ КЛАССЫ
+template<class tmp>
+tmp abs(tmp a) {
+	if (a > 0) {
+		return a;
+	}
+	else {
+		return -a;
+	}
+}
+
+//или например
+template<class tmp1, class tmp2>
+tmp1 abs(tmp2 a) {
+	if (a > 0) {
+		return a;
+	}
+	else {
+		return -a;
+	}
+}
+
+
+
+int main()
+{
+	AVLNode* Root = NULL;
+	Root = insert(Root, 12);
+	Root = insert(Root, 8);
+	Root = insert(Root, 18);
+	Root = insert(Root, 5);
+	Root = insert(Root, 11);
+	Root = insert(Root, 17);
+	Root = insert(Root, 4);
+	Root = insert(Root, 1);
+	Root = insert(Root, 2);
+	Root = insert(Root, 3);
+	Root = insert(Root, 5);
+	Root = insert(Root, 6);
+	Root = insert(Root, 7);
+	show(Root, 0);
+}
